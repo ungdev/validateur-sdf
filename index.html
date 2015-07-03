@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>SDF P2015 Validateur de places</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+      html, body {
+        background-color: #95a5a6;
+        font-family: sans-serif;
+        text-align: center;
+      }
+
+      h1 {
+        font-weight: 100;
+        font-size: 42px;
+      }
+
+      #place {
+        font-size: 24px;
+        padding: 10px;
+      }
+
+      #result {
+        font-size: 28px;
+        margin: 20px auto;
+        text-align: left;
+        width: 600px;
+      }
+
+      #okay {
+        height: 40px;
+        font-size: 36px;
+        font-weight: bold;
+        margin-top: 20px;
+      }
+
+      #username, #studentNumber {
+        float: right;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Validateur de places SDF 2015</h1>
+    <h3>NE PAS OUBLIER DE REPRENDRE LA CARTE ÉVÈNEMENT</h3>
+    <input type="text" id="place" autofocus>
+    <div id="okay">En attente</div>
+    <div id="result">
+      Nom: <span id="username">?</span><br>
+      Numéro utilisateur: <span id="studentNumber">?</span>
+    </div>
+
+    <script>
+    var places = [
+        { "last_name":"Doe", "first_name": "John", "student_id":null, "card_id":53 }
+    ];
+    </script>
+
+    <script>
+      var place = document.getElementById("place");
+      var username = document.getElementById("username");
+      var studentNumber = document.getElementById("studentNumber");
+      var okay = document.getElementById("okay");
+
+      place.focus();
+      place.onkeypress = function (e) {
+        if (e.keyCode === 13 || e.charCode === 13 || e.which === 13) {
+          check(place.value);
+          place.select();
+        }
+      };
+
+      function check (value) {
+        var found = false;
+        for (var i = places.length - 1; i >= 0; i--) {
+          // Replace trailing zero on the left by nothing, since the
+          // card id can start by one. ie: 053 and 53.
+          if (places[i].card_id.toString() === value.replace(/^0+/g, '')) {
+            found = places[i];
+          }
+        }
+
+        if (found === false) {
+          hasNotFound(value);
+        } else {
+          hasFound(found);
+        }
+      }
+
+      function hasNotFound (value) {
+        okay.style.color = "#c0392b";
+        okay.innerHTML = value + " non trouvé !"
+        username.innerHTML = "?";
+        studentNumber.innerHTML = "?";
+      }
+
+      function hasFound (place) {
+        okay.style.color = "green";
+        okay.innerHTML = "Trouvé !"
+        username.innerHTML = place.first_name + " " + place.last_name;
+        studentNumber.innerHTML = place.student_id;
+      }
+    </script>
+  </body>
+</html>
