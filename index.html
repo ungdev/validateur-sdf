@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>SDF P2015 Validateur de places</title>
+    <title>SDF P2016 Validateur de places</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <style>
@@ -43,7 +43,7 @@
     </style>
   </head>
   <body>
-    <h1>Validateur de places SDF 2015</h1>
+    <h1>Validateur de places SDF 2016</h1>
     <h3>NE PAS OUBLIER DE REPRENDRE LA CARTE ÉVÈNEMENT</h3>
     <input type="text" id="place" autofocus>
     <div id="okay">En attente</div>
@@ -54,7 +54,8 @@
 
     <script>
     var places = [
-        { "last_name":"Doe", "first_name": "John", "student_id":null, "card_id":53 }
+        { "last_name":"Doe", "first_name": "John", "student_id":null, "card_id":53 },
+        { "last_name":"Bate", "first_name": "Ala", "student_id":35397, "card_id":null }
     ];
     </script>
 
@@ -67,7 +68,13 @@
       place.focus();
       place.onkeypress = function (e) {
         if (e.keyCode === 13 || e.charCode === 13 || e.which === 13) {
-          check(place.value);
+          if (place.value.length <= 4) check(place.value);
+          else {
+            if (place.value.length >= 6) {
+              place.value = place.value.substr(8, 5);
+            }
+            checkEtu(place.value);
+          }
           place.select();
         }
       };
@@ -77,8 +84,29 @@
         for (var i = places.length - 1; i >= 0; i--) {
           // Replace trailing zero on the left by nothing, since the
           // card id can start by one. ie: 053 and 53.
-          if (places[i].card_id.toString() === value.replace(/^0+/g, '')) {
-            found = places[i];
+          if (places[i].card_id) {
+            if (places[i].card_id.toString() === value.replace(/^0+/g, '')) {
+              found = places[i];
+            }
+          }
+        }
+
+        if (found === false) {
+          hasNotFound(value);
+        } else {
+          hasFound(found);
+        }
+      }
+
+      function checkEtu (value)  {
+        var found = false;
+        for (var i = places.length - 1; i >= 0; i--) {
+          // Replace trailing zero on the left by nothing, since the
+          // card id can start by one. ie: 053 and 53.
+          if (places[i].student_id) {
+            if (places[i].student_id.toString() === value) {
+              found = places[i];
+            }
           }
         }
 
