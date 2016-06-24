@@ -48,6 +48,7 @@
     <input type="text" id="place" autofocus>
     <div id="okay">En attente</div>
     <div id="result">
+      <div id="multiple"><br /></div>
       Nom: <span id="username">?</span><br>
       Numéro utilisateur: <span id="studentNumber">?</span>
     </div>
@@ -55,7 +56,9 @@
     <script>
     var places = [
         { "last_name":"Doe", "first_name": "John", "student_id":null, "card_id":53 },
-        { "last_name":"Bate", "first_name": "Ala", "student_id":35397, "card_id":null }
+        { "last_name":"Bate", "first_name": "Ala", "student_id":35397, "card_id":null },
+        { "last_name":"Bob", "first_name": "Bob", "student_id":35398, "card_id":null },
+        { "last_name":"Bob", "first_name": "Bobette", "student_id":35399, "card_id":null }
     ];
     </script>
 
@@ -64,27 +67,49 @@
       var username = document.getElementById("username");
       var studentNumber = document.getElementById("studentNumber");
       var okay = document.getElementById("okay");
+      var multiple = document.getElementById("multiple");
 
       place.focus();
       place.onkeypress = function (e) {
         if (e.keyCode === 13 || e.charCode === 13 || e.which === 13) {
-          if (place.value.length <= 4) check(place.value);
-          else {
-            if (place.value.length >= 6) {
-              place.value = place.value.substr(8, 5);
+          if (isNaN(place.value)) {
+            checkLastname(place.value);
+          } else {
+            if (place.value.length <= 4) check(place.value);
+            else {
+              if (place.value.length >= 6) {
+                place.value = place.value.substr(8, 5);
+              }
+              checkEtu(place.value);
             }
-            checkEtu(place.value);
           }
           place.select();
         }
       };
 
+      function checkLastname (value) {
+        var found = [];
+        for (var i = places.length - 1; i >= 0; i--) {
+          if (places[i].last_name) {
+            if (places[i].last_name.toLowerCase() === value.toLowerCase()) {
+              found.push(places[i]);
+            }
+          }
+        }
+
+        if (found.length == 0) {
+          hasNotFound(value);
+        } else {
+          hasFoundName(found);
+        }
+      }
+
       function check (value) {
         var found = false;
         for (var i = places.length - 1; i >= 0; i--) {
-          // Replace trailing zero on the left by nothing, since the
-          // card id can start by one. ie: 053 and 53.
           if (places[i].card_id) {
+            // Replace trailing zero on the left by nothing, since the
+            // card id can start by one. ie: 053 and 53.
             if (places[i].card_id.toString() === value.replace(/^0+/g, '')) {
               found = places[i];
             }
@@ -101,8 +126,6 @@
       function checkEtu (value)  {
         var found = false;
         for (var i = places.length - 1; i >= 0; i--) {
-          // Replace trailing zero on the left by nothing, since the
-          // card id can start by one. ie: 053 and 53.
           if (places[i].student_id) {
             if (places[i].student_id.toString() === value) {
               found = places[i];
@@ -119,16 +142,33 @@
 
       function hasNotFound (value) {
         okay.style.color = "#c0392b";
-        okay.innerHTML = value + " non trouvé !"
+        okay.innerHTML = value + " non trouvé !";
         username.innerHTML = "?";
         studentNumber.innerHTML = "?";
       }
 
       function hasFound (place) {
         okay.style.color = "green";
-        okay.innerHTML = "Trouvé !"
+        okay.innerHTML = "Trouvé !";
+        multiple.innerHTML = "";
         username.innerHTML = place.first_name + " " + place.last_name;
         studentNumber.innerHTML = place.student_id;
+      }
+
+      function hasFoundName (found) {
+        if (found.length == 1) {
+          hasFound(found[0]);
+        } else {
+          okay.style.color = "green";
+          okay.innerHTML = "Plusieurs utilisateurs trouvés !";
+          multiple.innerHTML = "";
+          username.innerHTML = "?";
+          studentNumber.innerHTML = "?";
+          for (var i = found.length - 1; i >= 0; i--) {
+            multiple.innerHTML += found[i].first_name + " " + found[i].last_name + " ("+found[i].student_id +")<br />";
+          }
+          multiple.innerHTML += "<br />";
+        }
       }
     </script>
   </body>
